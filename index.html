@@ -160,6 +160,7 @@ em{font-style:italic;color:var(--blue)}
 .row2{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
 fieldset.fld{border:0;margin:0;padding:0}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.dd-btn{display:none}
 .chip{position:relative}
 .chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
 .chip span{display:block;padding:8px 12px;border:1px solid var(--blue);font:600 12px/1 var(--f-body);color:var(--blue);transition:background .2s,color .2s}
@@ -238,6 +239,16 @@ fieldset.fld{border:0;margin:0;padding:0}
   .services{padding:0}
   .svc-stage{padding-right:calc(var(--gut) + 8px)}
   .copy{display:none}
+  .dd-btn{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;margin-top:2px;padding:10px 0;background:transparent;border:0;border-bottom:1px solid var(--blue);border-radius:0;font:500 16px/1.35 var(--f-body);color:var(--ink);text-align:left;cursor:pointer}
+  .dd-btn.empty{color:rgba(12,22,70,.4)}
+  .dd-btn::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--blue);border-bottom:2px solid var(--blue);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+  .fld.open .dd-btn{border-bottom-color:var(--red)}
+  .fld.open .dd-btn::after{transform:rotate(-135deg) translate(-2px,-2px)}
+  .chips{display:none;flex-direction:column;flex-wrap:nowrap;gap:0;margin-top:6px;border:1px solid var(--blue);background:rgba(244,244,242,.96)}
+  .fld.open .chips{display:flex}
+  .chip span{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border:0;border-bottom:1px solid var(--blue-soft);font-size:14px;line-height:1.2}
+  .chip:last-child span{border-bottom:0}
+  .chip input:checked + span::after{content:"\2713";font-size:15px}
 }
 @media (prefers-reduced-motion:reduce){
   .wave g,.hint b{animation:none}
@@ -369,6 +380,7 @@ fieldset.fld{border:0;margin:0;padding:0}
               <div class="fld"><label for="f-contact" data-i="fContact"></label><input type="text" id="f-contact" name="contact" required autocomplete="email"></div>
             </div>
             <fieldset class="fld"><legend data-i="fServices"></legend>
+              <button type="button" class="dd-btn" id="ddBtn" aria-expanded="false" aria-controls="chips"><span id="ddTxt"></span></button>
               <div class="chips" id="chips"></div></fieldset>
             <div class="fld"><label for="f-msg" data-i="fMsg"></label><textarea id="f-msg" name="msg" rows="3"></textarea></div>
             <input type="text" name="_gotcha" id="f-gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
@@ -429,7 +441,7 @@ fieldset.fld{border:0;margin:0;padding:0}
       kPhone:'Телефон',kMail:'Почта',kPort:'Портфолио',cityMsk:'Москва',cityTbs:'Тбилиси',
       copy:'Копировать',copied:'Скопировано',
       portLink:'Смотреть работы →',portSoon:'Ссылка появится позже',
-      formH:'Оставить заявку',fName:'Имя',fContact:'Почта или телефон',fServices:'Что нужно',fMsg:'О проекте: задача, сроки, хронометраж',fSubmit:'Отправить заявку',
+      formH:'Оставить заявку',fName:'Имя',fContact:'Почта или телефон',fServices:'Что нужно',fPick:'Выберите услуги',fMsg:'О проекте: задача, сроки, хронометраж',fSubmit:'Отправить заявку',
       sending:'Отправляем…',okMsg:'Заявка отправлена. Мы ответим на указанный контакт.',failMsg:'Не получилось отправить заявку.',sentH:'Отправьте заявку письмом',sentOpen:'Открыть в почте',sentCopy:'Копировать текст',sentNote:'Текст заявки готов. Отправьте его на '+EMAIL+'.',
       mailSubject:'Заявка с сайта Paula.Dream.Studio',
       mName:'Имя',mContact:'Контакт',mServices:'Услуги',mMsg:'О проекте',mNone:'не указано'
@@ -454,7 +466,7 @@ fieldset.fld{border:0;margin:0;padding:0}
       kPhone:'Phone',kMail:'Email',kPort:'Portfolio',cityMsk:'Moscow',cityTbs:'Tbilisi',
       copy:'Copy',copied:'Copied',
       portLink:'Watch our work →',portSoon:'Link coming soon',
-      formH:'Send a request',fName:'Name',fContact:'Email or phone',fServices:'What you need',fMsg:'About the project: task, deadline, duration',fSubmit:'Send request',
+      formH:'Send a request',fName:'Name',fContact:'Email or phone',fServices:'What you need',fPick:'Select services',fMsg:'About the project: task, deadline, duration',fSubmit:'Send request',
       sending:'Sending…',okMsg:'Request sent. We will reply to the contact you left.',failMsg:'Could not send the request.',sentH:'Send your request by email',sentOpen:'Open in email',sentCopy:'Copy text',sentNote:'Your request text is ready. Send it to '+EMAIL+'.',
       mailSubject:'Request from Paula.Dream.Studio website',
       mName:'Name',mContact:'Contact',mServices:'Services',mMsg:'About the project',mNone:'not specified'
@@ -555,6 +567,10 @@ fieldset.fld{border:0;margin:0;padding:0}
       return '<label class="chip"><input type="checkbox" name="svc" value="'+i+'"'+(checked[i]?' checked':'')+'><span>'+t+'</span></label>';
     }).join('');
   }
+  function ddSync(){
+    var tx=T[lang],o=chipOpts(tx),sel=$$('#chips input:checked').map(function(c){return o[+c.value]});
+    var b=$('#ddBtn');$('#ddTxt').textContent=sel.length?sel.join(', '):tx.fPick;b.classList.toggle('empty',!sel.length);
+  }
   function applyLang(){
     var tx=T[lang];
     document.documentElement.lang=lang;
@@ -563,7 +579,7 @@ fieldset.fld{border:0;margin:0;padding:0}
       if(el.hasAttribute('data-html'))el.innerHTML=tx[k]; else el.textContent=tx[k];
     });
     $$('[data-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-lang')===lang)});
-    buildServices();buildSteps();buildChips();
+    buildServices();buildSteps();buildChips();ddSync();
     document.title='Paula.Dream.Studio';
     measureStrip();
   }
@@ -666,6 +682,13 @@ fieldset.fld{border:0;margin:0;padding:0}
     }
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fallback)}else fallback();
   }
+  (function(){
+    var fs=$('#chips').parentNode,b=$('#ddBtn');
+    b.addEventListener('click',function(){var o=fs.classList.toggle('open');b.setAttribute('aria-expanded',o)});
+    $('#chips').addEventListener('change',ddSync);
+    document.addEventListener('click',function(e){if(!fs.contains(e.target)){fs.classList.remove('open');b.setAttribute('aria-expanded','false')}});
+    $('#chips').closest('form').addEventListener('reset',function(){setTimeout(ddSync,0)});
+  })();
   $('#copyMail').addEventListener('click',function(){copyText(EMAIL,this)});
 
   var lastBody='';
