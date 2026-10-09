@@ -163,6 +163,7 @@ em{font-style:italic;color:var(--blue)}
 fieldset.fld{border:0;margin:0;padding:0}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .dd-btn{display:none}
+.open-form,.sheet-x{display:none}
 .chip{position:relative}
 .chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
 .chip span{display:block;padding:8px 12px;border:1px solid var(--blue);font:600 12px/1 var(--f-body);color:var(--blue);transition:background .2s,color .2s}
@@ -254,6 +255,20 @@ fieldset.fld{border:0;margin:0;padding:0}
   .chip span{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border:0;border-bottom:1px solid var(--blue-soft);font-size:14px;line-height:1.2}
   .chip:last-child span{border-bottom:0}
   .chip input:checked + span::after{content:"\2713";font-size:15px}
+
+  /* mobile form = full-screen sheet pinned to the visible area (stays put when the keyboard opens) */
+  .contact .open-form{display:flex;width:100%;max-width:none;padding:17px 20px}
+  .form{display:none;position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh;z-index:60;margin:0;border:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;align-content:start;gap:16px;
+    padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 72px);background:#e3e4e5}
+  .form::before{display:none}
+  .form h3{font-size:30px;padding-right:56px}
+  .form-open .form{display:grid}
+  html.form-open,html.form-open body{overflow:hidden;scroll-snap-type:none}
+  .sheet-x{display:grid;place-items:center;position:absolute;right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);width:48px;height:48px;padding:0;border:0;background:none;cursor:pointer;z-index:2}
+  .sheet-x::before,.sheet-x::after{content:"";position:absolute;width:22px;height:2px;background:var(--blue);transform:rotate(45deg)}
+  .sheet-x::after{transform:rotate(-45deg)}
+  .form .fld textarea{min-height:110px}
+  .form .btn[type=submit]{width:100%;padding:17px 20px}
 }
 @media (prefers-reduced-motion:reduce){
   .wave g,.hint b{animation:none}
@@ -378,11 +393,14 @@ fieldset.fld{border:0;margin:0;padding:0}
               <button type="button" class="btn ghost small copy" id="copyMail" data-i="copy"></button></span></div>
           </div>
 
-          <form class="form" id="form" autocomplete="on">
-            <h3 data-i="formH"></h3>
+          <button type="button" class="btn open-form" id="openForm" data-i="formH"></button>
+
+          <form class="form" id="form" autocomplete="on" role="dialog" aria-modal="false" aria-labelledby="formTitle">
+            <button type="button" class="sheet-x" id="formClose" aria-label="Close"></button>
+            <h3 id="formTitle" data-i="formH"></h3>
             <div class="row2">
               <div class="fld"><label for="f-name" data-i="fName"></label><input type="text" id="f-name" name="name" required autocomplete="name"></div>
-              <div class="fld"><label for="f-contact" data-i="fContact"></label><input type="text" id="f-contact" name="contact" required autocomplete="email"></div>
+              <div class="fld"><label for="f-contact" data-i="fContact"></label><input type="text" id="f-contact" name="contact" required autocomplete="email" enterkeyhint="next"></div>
             </div>
             <fieldset class="fld"><legend data-i="fServices"></legend>
               <button type="button" class="dd-btn" id="ddBtn" aria-expanded="false" aria-controls="chips"><span id="ddTxt"></span></button>
@@ -715,6 +733,36 @@ fieldset.fld{border:0;margin:0;padding:0}
     $('#chips').closest('form').addEventListener('reset',function(){setTimeout(ddSync,0)});
   })();
   $('#copyMail').addEventListener('click',function(){copyText(EMAIL,this)});
+
+  /* ---- mobile request sheet ---- */
+  (function(){
+    var f=$('#form'),vv=window.visualViewport,savedY=0,openNow=false;
+    function fit(){
+      if(!openNow||!vv)return;
+      f.style.height=vv.height+'px';f.style.top=vv.offsetTop+'px';
+    }
+    function openSheet(){
+      if(desk.matches||openNow)return;
+      savedY=window.scrollY||0;snapOn();openNow=true;
+      root.classList.add('form-open');fit();f.scrollTop=0;
+    }
+    function closeSheet(){
+      if(!openNow)return;
+      openNow=false;
+      document.activeElement&&document.activeElement.blur&&document.activeElement.blur();
+      root.classList.remove('form-open');f.style.height='';f.style.top='';
+      window.scrollTo(0,savedY);
+    }
+    $('#openForm').addEventListener('click',openSheet);
+    $('#formClose').addEventListener('click',closeSheet);
+    addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
+    if(vv){vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)}
+    desk.addEventListener&&desk.addEventListener('change',closeSheet);
+    f.addEventListener('focusin',function(e){
+      if(!openNow)return;
+      setTimeout(function(){fit();if(e.target.scrollIntoView)e.target.scrollIntoView({block:'center'})},320);
+    });
+  })();
 
   var lastBody='';
   function showFallback(body){
