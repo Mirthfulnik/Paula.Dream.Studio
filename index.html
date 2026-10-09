@@ -658,18 +658,38 @@ fieldset.fld{border:0;margin:0;padding:0}
   },{passive:false});
 
   /* ---- navigation ---- */
-  function scrollToY(y){window.scrollTo({top:Math.max(0,y),behavior:reduced?'auto':'smooth'})}
+  // On touch layouts CSS scroll-snap fights programmatic smooth scrolling (Safari jumps there and snaps back).
+  // So snapping is switched off while we travel and restored once the page has settled on an exact snap point.
+  var root=document.documentElement, snapTimer=0, settle=0;
+  function snapOn(){clearTimeout(settle);cancelAnimationFrame(snapTimer);root.style.scrollSnapType='';removeEventListener('touchstart',snapOn);removeEventListener('wheel',snapOn)}
+  function scrollToY(y){
+    y=Math.max(0,Math.round(y));
+    if(desk.matches){window.scrollTo({top:y,behavior:reduced?'auto':'smooth'});return}
+    snapOn();
+    root.style.scrollSnapType='none';
+    addEventListener('touchstart',snapOn,{once:true,passive:true});addEventListener('wheel',snapOn,{once:true,passive:true});
+    window.scrollTo({top:y,behavior:reduced?'auto':'smooth'});
+    var last=-1,still=0,t0=Date.now();
+    (function watch(){
+      var cur=window.scrollY||0;
+      still=(cur===last)?still+1:0; last=cur;
+      if(Math.abs(cur-y)<2||still>8||Date.now()-t0>2500){settle=setTimeout(snapOn,80);return}
+      snapTimer=requestAnimationFrame(watch);
+    })();
+  }
   function secTop(id){return $('#'+id).getBoundingClientRect().top+(window.scrollY||0)}
   function goTo(id){
     if(desk.matches){
       var vh=window.innerHeight/100, v={hero:0,services:100,process:100+S+100,contact:D}[id];
       scrollToY(v*vh+1);
-    }else scrollToY(id==='hero'?0:id==='services'?secTop(id)-bar():secTop(id));
+    }else scrollToY(id==='hero'?0:id==='services'?snapY(0):secTop(id));
   }
+  // scroll position of the i-th services snap marker (scroll-padding-top = bar)
+  function snapY(i){var m=$$('#services .snap')[i];return m?m.getBoundingClientRect().top+(window.scrollY||0)-bar():secTop('services')-bar()}
   function goService(i){
     var p=(i+.5)/N;
     if(desk.matches)scrollToY((100+S*p)*window.innerHeight/100);
-    else{var sec=$('#services'),span=sec.offsetHeight-(window.innerHeight-bar());scrollToY(secTop('services')-bar()+p*span)}
+    else scrollToY(snapY(i));
   }
   $$('[data-go]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();goTo(a.getAttribute('data-go'))})});
   $$('[data-lang]').forEach(function(b){b.addEventListener('click',function(){
