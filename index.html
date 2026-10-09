@@ -141,7 +141,6 @@ em{font-style:italic;color:var(--blue)}
 .c-row .v a{text-decoration:none;border-bottom:1px solid var(--blue-soft)}
 .c-row .v a:hover{border-color:var(--red);color:var(--red)}
 .c-row .v small{font:400 12px/1 var(--f-mono);letter-spacing:.06em;opacity:.65;margin-left:8px}
-.c-year{font:500 clamp(54px,7vw,110px)/.8 var(--f-display);color:var(--blue);margin:8px 0 0;font-variant-numeric:lining-nums}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 22px;border:1px solid var(--blue);background:var(--blue);color:#f1f1ef;font:600 12px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;cursor:pointer;border-radius:0;transition:background .25s,border-color .25s,color .25s}
 .btn:hover{background:var(--red);border-color:var(--red)}
 .btn.ghost{background:transparent;color:var(--blue)}
@@ -214,7 +213,6 @@ fieldset.fld{border:0;margin:0;padding:0}
   .c-info{flex:1 1 46%;min-width:0;gap:16px}
   .form{flex:1 1 50%;min-width:0;gap:13px}
   .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .c-year{margin-top:10px}
 }
 /* MOBILE: page-by-page scrolling (each screen snaps like a page; services snap per step) */
 .snap,.dots{display:none}
@@ -235,19 +233,11 @@ fieldset.fld{border:0;margin:0;padding:0}
   .steps .t{font-size:14.5px}
   .contact{gap:18px;justify-content:flex-start}
   .c-info{gap:12px}
-  .c-year{font-size:56px;margin-top:2px}
   .form{padding:18px 16px;gap:12px}
   .chip span{padding:7px 10px;font-size:11.5px}
   .services{padding:0}
   .svc-stage{padding-right:calc(var(--gut) + 8px)}
-  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-  .hero.in .hero-text > *{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
-  .hero.in .hero-text > *:nth-child(2){animation-delay:.08s}
-  .hero.in .hero-text > *:nth-child(3){animation-delay:.16s}
-  .hero.in .hero-art{animation:rise .9s .2s cubic-bezier(.2,.7,.2,1) both}
-  .process.in .steps li{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--k) * 45ms)}
-  .contact.in .c-info,.contact.in .form{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
-  .contact.in .form{animation-delay:.1s}
+  .copy{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   .wave g,.hint b{animation:none}
@@ -370,7 +360,6 @@ fieldset.fld{border:0;margin:0;padding:0}
             <div class="c-row"><span class="k" data-i="kMail"></span>
               <span class="v"><a id="mailLink" href="mailto:paula.dream.projects@gmail.com">paula.dream.projects@gmail.com</a>
               <button type="button" class="btn ghost small copy" id="copyMail" data-i="copy"></button></span></div>
-                        <p class="c-year">2026</p>
           </div>
 
           <form class="form" id="form" autocomplete="on">
