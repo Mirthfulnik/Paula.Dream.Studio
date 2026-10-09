@@ -86,7 +86,7 @@ em{font-style:italic;color:var(--blue)}
 .svc-stage{position:sticky;top:var(--bar);height:calc(100svh - var(--bar));padding:22px var(--gut) 28px;display:flex;flex-direction:column;gap:22px;overflow:hidden}
 .svc-strip{overflow:hidden;margin-inline:calc(var(--gut) * -1);padding-inline:var(--gut)}
 .svc-list{list-style:none;margin:0;padding:0;display:flex;gap:30px;white-space:nowrap;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
-.svc-list button{background:none;border:0;padding:0;cursor:pointer;text-align:left;font:500 clamp(28px,8vw,48px)/1.05 var(--f-display);color:transparent;-webkit-text-stroke:1px rgba(31,63,208,.5);transition:color .45s,-webkit-text-stroke-color .45s}
+.svc-list button{background:none;border:0;padding:0;cursor:pointer;text-align:left;font:500 clamp(24px,6.6vw,44px)/1.05 var(--f-display);color:transparent;-webkit-text-stroke:1px rgba(31,63,208,.5);transition:color .45s,-webkit-text-stroke-color .45s}
 .svc-list li.on button{color:var(--blue);-webkit-text-stroke-color:var(--blue)}
 .covers{position:relative;width:100%;aspect-ratio:16/9;margin-top:6px}
 .covers::before{content:"";position:absolute;right:-12px;top:-12px;width:34%;aspect-ratio:1;background:var(--red);border-radius:0 100% 0 0;opacity:.9;mix-blend-mode:multiply;transition:transform .6s}
@@ -210,8 +210,32 @@ fieldset.fld{border:0;margin:0;padding:0}
   .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .c-year{margin-top:10px}
 }
+/* MOBILE: page-by-page scrolling (each screen snaps like a page; services snap per step) */
+.snap,.dots{display:none}
+@media not all and (min-width:900px) and (min-height:640px){
+  html{scroll-snap-type:y mandatory;scroll-padding-top:var(--bar)}
+  .hero,.process,.contact{scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:calc(var(--bar) * -1)}
+  .snap{display:block;position:absolute;left:0;width:1px;height:1px;scroll-snap-align:start;scroll-snap-stop:always;pointer-events:none}
+  .dots{display:flex;flex-direction:column;gap:14px;position:fixed;right:5px;top:50%;transform:translateY(-50%);z-index:21}
+  .dots button{width:22px;height:22px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+  .dots button::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue-soft);transition:transform .35s,background .35s}
+  .dots button[aria-current="true"]::before{background:var(--red);transform:scale(1.7)}
+  .panel{padding-right:calc(var(--gut) + 8px)}
+  .services{padding:0}
+  .svc-stage{padding-right:calc(var(--gut) + 8px)}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  .hero.in .hero-text > *{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+  .hero.in .hero-text > *:nth-child(2){animation-delay:.08s}
+  .hero.in .hero-text > *:nth-child(3){animation-delay:.16s}
+  .hero.in .hero-art{animation:rise .9s .2s cubic-bezier(.2,.7,.2,1) both}
+  .process.in .steps li{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--k) * 45ms)}
+  .contact.in .c-info,.contact.in .form{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+  .contact.in .form{animation-delay:.1s}
+}
 @media (prefers-reduced-motion:reduce){
   .wave g,.hint b{animation:none}
+  .hero .hero-text > *,.hero .hero-art,.process .steps li,.contact .c-info,.contact .form{animation:none!important}
+  html{scroll-snap-type:none}
   .cover,.svc-list,.svc-count i,.svc-list button::before{transition:none}
 }
 </style>
@@ -246,6 +270,12 @@ fieldset.fld{border:0;margin:0;padding:0}
       <button type="button" data-lang="en" aria-pressed="false">EN</button>
     </div>
   </header>
+  <nav class="dots" aria-label="Pages">
+    <button type="button" data-go="hero" aria-label="1"></button>
+    <button type="button" data-go="services" aria-label="2"></button>
+    <button type="button" data-go="process" aria-label="3"></button>
+    <button type="button" data-go="contact" aria-label="4"></button>
+  </nav>
   <div class="prog" aria-hidden="true"><i id="progFill"></i></div>
 
   <div class="track" id="track">
@@ -286,6 +316,7 @@ fieldset.fld{border:0;margin:0;padding:0}
 
         <!-- SERVICES -->
         <section class="panel services" id="services" data-sec="services">
+          <i class="snap" style="top:3svh"></i><i class="snap" style="top:73svh"></i><i class="snap" style="top:143svh"></i><i class="snap" style="top:213svh"></i>
           <div class="svc-stage" id="svcStage">
             <div class="svc-left">
               <div class="svc-eye"><p class="eyebrow" data-i="svcEye"></p></div>
@@ -365,7 +396,7 @@ fieldset.fld{border:0;margin:0;padding:0}
   var COVERS=[
   {video:'video/voice.mp4', poster:'video/voice.png'},
   {video:'video/music.mp4', poster:'video/music.png'},
-  {video:'video/sound.mov', poster:'video/sound.png'},
+  {video:'video/sound.mp4', poster:'video/sound.png'},
   {video:'video/mix.mp4',   poster:'video/mix.png'}
 ];
 
@@ -507,7 +538,7 @@ fieldset.fld{border:0;margin:0;padding:0}
     });
   }
   function buildSteps(){
-    $('#steps').innerHTML=T[lang].steps.map(function(t,i){return '<li><span class="n">'+(i+1)+'</span><span class="t">'+t+'</span></li>'}).join('');
+    $('#steps').innerHTML=T[lang].steps.map(function(t,i){return '<li style="--k:'+i+'"><span class="n">'+(i+1)+'</span><span class="t">'+t+'</span></li>'}).join('');
   }
   function chipOpts(tx){return tx.services.map(function(s){return s.t}).concat(tx.extras)}
   function buildChips(){
@@ -577,7 +608,8 @@ fieldset.fld{border:0;margin:0;padding:0}
     setActive(m.idx);
     $('#progFill').style.width=(m.prog*100)+'%';
     var ids=['hero','services','process','contact'];
-    $$('.nav a').forEach(function(a){a.setAttribute('aria-current',a.getAttribute('data-go')===ids[m.sec])});
+    $$('.nav a,.dots button').forEach(function(a){a.setAttribute('aria-current',a.getAttribute('data-go')===ids[m.sec])});
+    ids.forEach(function(id,k){$('#'+id).classList.toggle('in',k===m.sec)});
     if(desk.matches){tgtI=m.i;if(!raf)raf=requestAnimationFrame(loop)}
     else{rail.style.transform='';curI=0}
   }
@@ -603,7 +635,7 @@ fieldset.fld{border:0;margin:0;padding:0}
     if(desk.matches){
       var vh=window.innerHeight/100, v={hero:0,services:100,process:100+S+100,contact:D}[id];
       scrollToY(v*vh+1);
-    }else scrollToY(id==='hero'?0:secTop(id)-bar()+(id==='services'?0:0));
+    }else scrollToY(id==='hero'?0:id==='services'?secTop(id)-bar():secTop(id));
   }
   function goService(i){
     var p=(i+.5)/N;
