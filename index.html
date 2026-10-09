@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#cbcccd">
 <title>Paula.Dream.Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,6 +227,17 @@ fieldset.fld{border:0;margin:0;padding:0}
   .dots button::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue-soft);transition:transform .35s,background .35s}
   .dots button[aria-current="true"]::before{background:var(--red);transform:scale(1.7)}
   .panel{padding-right:calc(var(--gut) + 8px)}
+  .process,.contact{padding-top:calc(var(--bar) + 18px);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+  .process h2,.contact h2{font-size:clamp(32px,9vw,40px)}
+  .process .eyebrow,.contact .eyebrow{margin-bottom:12px}
+  .steps li{padding:6px 0;gap:12px}
+  .steps .n{font-size:22px}
+  .steps .t{font-size:14.5px}
+  .contact{gap:18px;justify-content:flex-start}
+  .c-info{gap:12px}
+  .c-year{font-size:56px;margin-top:2px}
+  .form{padding:18px 16px;gap:12px}
+  .chip span{padding:7px 10px;font-size:11.5px}
   .services{padding:0}
   .svc-stage{padding-right:calc(var(--gut) + 8px)}
   @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
@@ -239,6 +256,8 @@ fieldset.fld{border:0;margin:0;padding:0}
   .cover,.svc-list,.svc-count i,.svc-list button::before{transition:none}
 }
 </style>
+</head>
+<body>
 
 <div class="marble" aria-hidden="true">
   <svg preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -707,3 +726,5 @@ fieldset.fld{border:0;margin:0;padding:0}
   onScroll();
 })();
 </script>
+</body>
+</html>
