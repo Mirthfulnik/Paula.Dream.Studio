@@ -84,6 +84,8 @@ em{font-style:italic;color:var(--blue)}
 .hint{font:500 11px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin:0;position:relative;z-index:2}
 .hint b{font-weight:500;color:var(--red);animation:nudge 1.6s ease-in-out infinite}
 .hint .d{display:none}
+.cta{display:flex;gap:14px;position:relative;z-index:2;margin-top:6px}
+.cta .btn{min-width:150px}
 @keyframes nudge{50%{transform:translateY(5px)}}
 .spec{position:absolute;right:var(--gut);bottom:24px;z-index:2;font:400 10px/1 var(--f-mono);letter-spacing:.18em;color:var(--ink);opacity:.7;margin:0}
 
@@ -239,6 +241,9 @@ fieldset.fld{border:0;margin:0;padding:0}
   .services{padding:0}
   .svc-stage{padding-right:calc(var(--gut) + 8px)}
   .copy{display:none}
+  .cta{gap:12px;margin:20px 0 0}
+  .cta .btn{flex:1 1 0;max-width:170px;padding:13px 12px}
+  .contact{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
   .dd-btn{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;margin-top:2px;padding:10px 0;background:transparent;border:0;border-bottom:1px solid var(--blue);border-radius:0;font:500 16px/1.35 var(--f-body);color:var(--ink);text-align:left;cursor:pointer}
   .dd-btn.empty{color:rgba(12,22,70,.4)}
   .dd-btn::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--blue);border-bottom:2px solid var(--blue);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
@@ -308,7 +313,7 @@ fieldset.fld{border:0;margin:0;padding:0}
           <div class="hero-text">
             <p class="sub" data-i="heroSub"></p>
             <h1 data-i="heroH" data-html></h1>
-            <p class="hint"><b class="m">↓</b><span class="m" data-i="hintM"></span><span class="d" data-i="hintD"></span><b class="d" style="animation-name:none">→</b></p>
+            <div class="cta"><a class="btn" href="#" data-go="services" data-i="ctaWorks"></a><a class="btn ghost" href="#" data-go="contact" data-i="ctaContact"></a></div>
           </div>
           <div class="hero-art" aria-hidden="true">
             <svg viewBox="0 0 1618 1000" xmlns="http://www.w3.org/2000/svg">
@@ -441,7 +446,7 @@ fieldset.fld{border:0;margin:0;padding:0}
       kPhone:'Телефон',kMail:'Почта',kPort:'Портфолио',cityMsk:'Москва',cityTbs:'Тбилиси',
       copy:'Копировать',copied:'Скопировано',
       portLink:'Смотреть работы →',portSoon:'Ссылка появится позже',
-      formH:'Оставить заявку',fName:'Имя',fContact:'Почта или телефон',fServices:'Что нужно',fPick:'Выберите услуги',fMsg:'О проекте: задача, сроки, хронометраж',fSubmit:'Отправить заявку',
+      formH:'Оставить заявку',fName:'Имя',fContact:'Почта или телефон',fServices:'Что нужно',ctaWorks:'Работы',ctaContact:'Контакты',fPick:'Выберите услуги',fMsg:'О проекте: задача, сроки, хронометраж',fSubmit:'Отправить заявку',
       sending:'Отправляем…',okMsg:'Заявка отправлена. Мы ответим на указанный контакт.',failMsg:'Не получилось отправить заявку.',sentH:'Отправьте заявку письмом',sentOpen:'Открыть в почте',sentCopy:'Копировать текст',sentNote:'Текст заявки готов. Отправьте его на '+EMAIL+'.',
       mailSubject:'Заявка с сайта Paula.Dream.Studio',
       mName:'Имя',mContact:'Контакт',mServices:'Услуги',mMsg:'О проекте',mNone:'не указано'
@@ -466,7 +471,7 @@ fieldset.fld{border:0;margin:0;padding:0}
       kPhone:'Phone',kMail:'Email',kPort:'Portfolio',cityMsk:'Moscow',cityTbs:'Tbilisi',
       copy:'Copy',copied:'Copied',
       portLink:'Watch our work →',portSoon:'Link coming soon',
-      formH:'Send a request',fName:'Name',fContact:'Email or phone',fServices:'What you need',fPick:'Select services',fMsg:'About the project: task, deadline, duration',fSubmit:'Send request',
+      formH:'Send a request',fName:'Name',fContact:'Email or phone',fServices:'What you need',ctaWorks:'Our work',ctaContact:'Contact',fPick:'Select services',fMsg:'About the project: task, deadline, duration',fSubmit:'Send request',
       sending:'Sending…',okMsg:'Request sent. We will reply to the contact you left.',failMsg:'Could not send the request.',sentH:'Send your request by email',sentOpen:'Open in email',sentCopy:'Copy text',sentNote:'Your request text is ready. Send it to '+EMAIL+'.',
       mailSubject:'Request from Paula.Dream.Studio website',
       mName:'Name',mContact:'Contact',mServices:'Services',mMsg:'About the project',mNone:'not specified'
