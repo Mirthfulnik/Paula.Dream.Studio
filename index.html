@@ -365,7 +365,7 @@ fieldset.fld{border:0;margin:0;padding:0}
   var COVERS=[
   {video:'video/voice.mp4', poster:'video/voice.png'},
   {video:'video/music.mp4', poster:'video/music.png'},
-  {video:'video/sound.mp4', poster:'video/sound.png'},
+  {video:'video/sound.mov', poster:'video/sound.png'},
   {video:'video/mix.mp4',   poster:'video/mix.png'}
 ];
 
@@ -648,17 +648,26 @@ fieldset.fld{border:0;margin:0;padding:0}
     $('#sent').hidden=true;
     if(!FORM_ENDPOINT){showFallback(body);return}
     btn.disabled=true;st.hidden=false;st.className='status';st.textContent=tx.sending;
-    var payload={name:f.name.value.trim(),contact:f.contact.value.trim(),services:svc,message:f.msg.value.trim()||tx.mNone,language:lang.toUpperCase(),_subject:tx.mailSubject};
-    var fail=function(){
-      btn.disabled=false;st.className='status err';st.textContent=tx.failMsg;showFallback(body);
+    var contact=f.contact.value.trim(), fd=new FormData();
+    fd.append('name',f.name.value.trim());
+    fd.append('contact',contact);
+    if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact))fd.append('email',contact);   // enables reply-to in Formspree
+    fd.append('services',svc);
+    fd.append('message',f.msg.value.trim()||tx.mNone);
+    fd.append('language',lang.toUpperCase());
+    fd.append('_subject',tx.mailSubject);
+    var fail=function(detail){
+      btn.disabled=false;st.className='status err';st.textContent=tx.failMsg+(detail?' ('+detail+')':'');showFallback(body);
     };
-    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)})
+    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Accept':'application/json'},body:fd})
       .then(function(r){
-        if(!r.ok)throw new Error('http '+r.status);
-        btn.disabled=false;st.className='status';st.textContent=tx.okMsg;
-        f.reset();
+        if(r.ok){btn.disabled=false;st.className='status';st.textContent=tx.okMsg;f.reset();return}
+        return r.json().catch(function(){return {}}).then(function(j){
+          var d=j.error||(j.errors&&j.errors.map(function(x){return x.message}).join('; '))||'';
+          fail('HTTP '+r.status+(d?': '+d:''));
+        });
       })
-      .catch(fail);
+      .catch(function(){fail('')});
   });
   $('#sentCopy').addEventListener('click',function(){copyText(lastBody,this)});
 
